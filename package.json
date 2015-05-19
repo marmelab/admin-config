@@ -1,0 +1,21 @@
+{
+  "name": "admin-config",
+  "version": "0.1.0",
+  "private": false,
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/marmelab/admin-config.git"
+  },
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "devDependencies": {
+    "chai": "^2.3.0",
+    "mocha": "^2.2.5",
+    "mocha-traceur": "^2.1.0",
+    "sinon": "^1.14.1"
+  },
+  "scripts": {
+    "test": "make test"
+  }
+}
