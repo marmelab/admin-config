@@ -40,7 +40,9 @@ describe('ReferenceField', function() {
 
             ref
                 .targetEntity(human)
-                .targetField(new Field('name'));
+                .targetField(new Field('name'))
+                .sortField('name')
+                .sortDir('DESC');
 
             human
                 .identifier(new Field('id'))
