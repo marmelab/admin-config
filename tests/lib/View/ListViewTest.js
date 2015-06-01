@@ -26,4 +26,23 @@ describe('ListView', function() {
             assert.deepEqual({category: category}, view.getFilterReferences());
         });
     });
+
+    describe('filters()', function() {
+        it('should return ordered filters field without any field required validation', function() {
+            var post = new Entity('post');
+            var category = new ReferenceField('category');
+            var title = (new Field('title')).validation({ required: true });
+            var view = new ListView(post)
+                .fields([
+                    title
+                ])
+                .filters([
+                    title.order(2),
+                    category.order(1)
+                ]);
+
+            assert.deepEqual([ category, title ], view.filters());
+            assert.equal(view.filters()[0].validation().required, false);
+        });
+    });
 });
