@@ -1,6 +1,7 @@
 var assert = require('chai').assert;
 
-import Entity from "../../../lib/Entity/Entity";
+import Entity from '../../../lib/Entity/Entity';
+import Field from '../../../lib/Field/Field';
 
 describe('Entity', function() {
     describe('views', function() {
@@ -22,7 +23,7 @@ describe('Entity', function() {
 
     describe('label', function() {
         it('should return given label if already set', function() {
-            var post = new Entity('post').label("Article");
+            var post = new Entity('post').label('Article');
             assert.equal('Article', post.label());
         });
 
@@ -60,11 +61,11 @@ describe('Entity', function() {
             assert.equal(false, entity.editionView().enabled);
             assert.equal(false, entity.deletionView().enabled);
         });
-    })
+    });
     
     describe('createMethod', function() {
         it('should return given createMethod if already set', function() {
-            var post = new Entity('post').createMethod("put");
+            var post = new Entity('post').createMethod('put');
             assert.equal('put', post.createMethod());
         });
 
@@ -76,13 +77,29 @@ describe('Entity', function() {
     
     describe('updateMethod', function() {
         it('should return given updateMethod if already set', function() {
-            var post = new Entity('post').updateMethod("post");
+            var post = new Entity('post').updateMethod('post');
             assert.equal('post', post.updateMethod());
         });
 
         it('should return null if no updateMethod has been set', function() {
             var post = new Entity('post');
             assert.equal(null, post.updateMethod());
+        });
+    });
+
+    describe('identifier', function() {
+        it('should set default identifier', function() {
+            var post = new Entity('post');
+            assert.equal('id', post.identifier().name());
+        });
+
+        it('should set custom identifier', function() {
+            var post = new Entity('post').identifier(new Field('my_id'));
+            assert.equal('my_id', post.identifier().name());
+        });
+
+        it('should throw error on wrong argument', function() {
+            assert.throw(function () { new Entity('post').identifier('my_id'); }, Error, 'Entity post: identifier must be an instance of Field');
         });
     });
 });
