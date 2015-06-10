@@ -2,10 +2,10 @@ let assert = require('chai').assert,
     sinon = require('sinon');
 
 import ReadQueries from "../../../lib/Queries/ReadQueries";
-import DataStore from "../../../lib/DataStore/DataStore";
 import PromisesResolver from "../../mock/PromisesResolver";
 import Entity from "../../../lib/Entity/Entity";
 import ReferenceField from "../../../lib/Field/ReferenceField";
+import ReferencedListField from "../../../lib/Field/ReferencedListField";
 import TextField from "../../../lib/Field/TextField";
 import Field from "../../../lib/Field/Field";
 import buildPromise from "../../mock/mixins";
@@ -18,7 +18,8 @@ describe('ReadQueries', () => {
         rawHumans,
         catEntity,
         humanEntity,
-        catView;
+        catView,
+        humanView;
 
     beforeEach(() => {
         application = {
@@ -35,7 +36,12 @@ describe('ReadQueries', () => {
         readQueries = new ReadQueries(restWrapper, PromisesResolver, application);
         catEntity = new Entity('cat');
         humanEntity = new Entity('human');
-        catView = catEntity.views["ListView"]
+        humanView = humanEntity.listView()
+            .fields([
+                new Field('name'),
+                new ReferencedListField('cat_id').targetEntity(catEntity).targetReferenceField('human_id')
+            ]);
+        catView = catEntity.listView()
             .addField(new TextField('name'))
             .addField(new ReferenceField('human_id').targetEntity(humanEntity).targetField(new Field('firstName')));
 
@@ -101,6 +107,28 @@ describe('ReadQueries', () => {
 
                     assert.equal(result.data[0].human_id, 1);
                 });
+        });
+
+        it('should send correct page params to the API call', () => {
+            let spy = sinon.spy(readQueries, 'getRawValues');
+
+            readQueries.getAll(catView, 2);
+
+            assert(spy.withArgs(catEntity, catView.name(), catView.type, 2).calledOnce);
+        });
+
+        it('should send correct sort params to the API call', () => {
+            let spy = sinon.spy(readQueries, 'getRawValues');
+            catView.sortField('name').sortDir('DESC');
+            let viewName = catView.name();
+
+            readQueries.getAll(catView, 1);
+            readQueries.getAll(catView, 1, [], 'unknow_ListView.name', 'ASC');
+            readQueries.getAll(catView, 1, [], viewName + '.id', 'ASC');
+
+            assert(spy.withArgs(catEntity, viewName, catView.type, 1, catView.perPage(), undefined, catView.filters(), viewName + '.name', 'DESC').calledOnce);
+            assert(spy.withArgs(catEntity, viewName, catView.type, 1, catView.perPage(), [], catView.filters(), viewName + '.name', 'DESC').calledOnce);
+            assert(spy.withArgs(catEntity, viewName, catView.type, 1, catView.perPage(), [], catView.filters(), viewName + '.id', 'ASC').calledOnce);
         });
     });
 
@@ -176,6 +204,37 @@ describe('ReadQueries', () => {
                     assert.equal(referencedData['author'][0].id, 'abc');
                     assert.equal(referencedData['author'][1].name, 'Ragna');
                 });
+        });
+    });
+
+     describe('getReferencedListData', () => {
+        it('should return all referenced list data for a View', () => {
+            restWrapper.getList = sinon.stub().returns(buildPromise({data: rawCats, headers: () => {}}));
+            PromisesResolver.allEvenFailed = sinon.stub().returns(buildPromise([
+                {status: 'success', result: { data: rawCats }}
+            ]));
+
+            readQueries.getReferencedListData(humanView.getReferencedLists(), null, null, 1)
+                .then((referencedListEntries) => {
+                    assert.equal(referencedListEntries['cat_id'].length, 2);
+                    assert.equal(referencedListEntries['cat_id'][0].id, 1);
+                    assert.equal(referencedListEntries['cat_id'][1].name, 'Suna');
+                });
+        });
+
+        it('should send correct sort params to the API call', () => {
+            let spy = sinon.spy(readQueries, 'getRawValues');
+            humanView.getReferencedLists()['cat_id'].sortField('name').sortDir('DESC');
+            let viewName = catView.name();
+            let perPage = humanView.getReferencedLists()['cat_id'].perPage();
+            let targetEntity = humanView.getReferencedLists()['cat_id'].targetEntity();
+
+            readQueries.getReferencedListData(humanView.getReferencedLists(), null, null, 1);
+            readQueries.getReferencedListData(humanView.getReferencedLists(), 'unknow_ListView.name', 'ASC', 1);
+            readQueries.getReferencedListData(humanView.getReferencedLists(), 'cat_ListView.id', 'ASC', 1);
+
+            assert(spy.withArgs(catEntity, viewName, 'listView', 1, perPage, { 'human_id': 1 }, {}, viewName + '.name', 'DESC').calledTwice);
+            assert(spy.withArgs(targetEntity, viewName, 'listView', 1, perPage, { 'human_id': 1 }, {}, viewName + '.id', 'ASC').calledOnce);
         });
     });
 });
