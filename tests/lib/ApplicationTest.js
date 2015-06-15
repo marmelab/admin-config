@@ -268,7 +268,9 @@ describe('Application', function() {
                 post = new Entity('post'),
                 fields = [
                     new Field('field1'),
-                    new Field('field2')
+                    new Field('field2'),
+                    new Field('field3'),
+                    new Field('field4')                    
                 ];
 
             comment.listView().fields(fields);
@@ -281,7 +283,7 @@ describe('Application', function() {
             assert.property(dashboard.collections(), 'comment');
             assert.notProperty(dashboard.collections(), 'post');
             let commentCollection = dashboard.collections().comment;
-            assert.deepEqual(commentCollection.fields(), fields);
+            assert.deepEqual(commentCollection.fields(), fields.filter((el, i) => i < 3));
         });
     });
 });
