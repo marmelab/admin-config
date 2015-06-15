@@ -1,5 +1,6 @@
 import Factory from "../../lib/Factory";
 import Field from "../../lib/Field/Field";
+import Collection from "../../lib/Collection";
 
 var assert = require('chai').assert;
 
@@ -42,4 +43,15 @@ describe('Factory', function() {
             assert.equal('string', field.type());
         });
     });
+
+    describe('collection()', () => {
+        it('should return a new Collection with the correct entity', () => {
+            var factory = new Factory();
+            var dummyEntity = { name: () => 'foo' };
+            var collection = factory.collection(dummyEntity);
+            assert.instanceOf(collection, Collection);
+            assert.equal(collection.getEntity(), dummyEntity);
+            assert.equal(collection.name(), 'foo_collection');
+        })
+    })
 });

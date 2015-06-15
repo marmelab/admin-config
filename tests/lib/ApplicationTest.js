@@ -2,6 +2,8 @@ var assert = require('chai').assert;
 
 import Application from "../../lib/Application";
 import Entity from "../../lib/Entity/Entity";
+import Field from "../../lib/Field/Field";
+import Dashboard from "../../lib/Dashboard";
 
 describe('Application', function() {
     describe('getRouteFor', function() {
@@ -219,5 +221,67 @@ describe('Application', function() {
             assert.equal('E1', menu2.title());
             assert.equal('E3', menu3.title());
         });
-    })
+    });
+
+    describe('dashboard()', () => {
+        it('should return an empty dashboard by default', () => {
+            let dashboard = new Application().dashboard();
+            assert.deepEqual(dashboard.collections(), {});
+        });
+
+        it('should serve as a setter', () => {
+            let dashboard = new Dashboard();
+            const collection = { IAmAFakeCollection: true }; 
+            dashboard.addCollection('foo', collection)
+            let application = new Application();
+            application.dashboard(dashboard);
+            assert.deepEqual(application.dashboard().collections(), { foo: collection });
+        });
+    });
+
+    describe('buildDashboardFromEntities()', () => {
+        it('should create a dashboard based on the entity dashboard views', () => {
+            let application = new Application(),
+                comment = new Entity('comment'),
+                post = new Entity('post'),
+                fields = [
+                    new Field('field1'),
+                    new Field('field2')
+                ];
+
+            comment.dashboardView().fields(fields);
+            post.listView().fields(fields); // should be ignored
+
+            application
+                .addEntity(post)
+                .addEntity(comment);
+
+            let dashboard = application.buildDashboardFromEntities();
+            assert.property(dashboard.collections(), 'comment');
+            assert.notProperty(dashboard.collections(), 'post');
+            let commentCollection = dashboard.collections().comment;
+            assert.deepEqual(commentCollection.fields(), fields);
+        });
+        it('should create a dashboard based on the entity list views if no dashboard views', () => {
+            let application = new Application(),
+                comment = new Entity('comment'),
+                post = new Entity('post'),
+                fields = [
+                    new Field('field1'),
+                    new Field('field2')
+                ];
+
+            comment.listView().fields(fields);
+
+            application
+                .addEntity(post)
+                .addEntity(comment);
+
+            let dashboard = application.buildDashboardFromEntities();
+            assert.property(dashboard.collections(), 'comment');
+            assert.notProperty(dashboard.collections(), 'post');
+            let commentCollection = dashboard.collections().comment;
+            assert.deepEqual(commentCollection.fields(), fields);
+        });
+    });
 });
