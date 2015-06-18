@@ -11,8 +11,8 @@ describe('Dashboard', () => {
     describe('addCollection()', () => {
         it('should add a collection', () => {
             let dashboard = new Dashboard();
-            const collection = { IAmAFakeCollection: true }; 
-            dashboard.addCollection('foo', collection);
+            const collection = { IAmAFakeCollection: true, name: () => 'foo' }; 
+            dashboard.addCollection(collection);
             assert.deepEqual(dashboard.collections(), { foo: collection })
         });
     });
@@ -23,7 +23,7 @@ describe('Dashboard', () => {
         });
         it('should return true for non-empty dashboards', () => {
             let dashboard = new Dashboard();
-            dashboard.addCollection('foo', {});
+            dashboard.addCollection({ name: () => 'bar' });
             assert.ok(dashboard.hasCollections());
         });
     });

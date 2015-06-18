@@ -51,7 +51,7 @@ describe('Factory', function() {
             var collection = factory.collection(dummyEntity);
             assert.instanceOf(collection, Collection);
             assert.equal(collection.getEntity(), dummyEntity);
-            assert.equal(collection.name(), 'foo_collection');
+            assert.equal(collection.name(), 'foo');
         })
     })
 });
