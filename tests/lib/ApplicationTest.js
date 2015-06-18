@@ -108,22 +108,22 @@ describe('Application', function() {
                 post = new Entity('post'),
                 comment = new Entity('comment');
 
-            post.views["DashboardView"].enable();
-            comment.views["DashboardView"].enable();
+            post.views["ShowView"].enable();
+            comment.views["ShowView"].enable();
 
             application
                 .addEntity(post)
                 .addEntity(comment);
 
-            let views = application.getViewsOfType('DashboardView');
+            let views = application.getViewsOfType('ShowView');
 
             assert.equal(2, views.length);
 
             assert.equal('post', views[0].entity.name());
-            assert.equal('DashboardView', views[0].type);
+            assert.equal('ShowView', views[0].type);
 
             assert.equal('comment', views[1].entity.name());
-            assert.equal('DashboardView', views[1].type);
+            assert.equal('ShowView', views[1].type);
         });
 
         it('should return only enabled views of type', () => {
@@ -231,8 +231,8 @@ describe('Application', function() {
 
         it('should serve as a setter', () => {
             let dashboard = new Dashboard();
-            const collection = { IAmAFakeCollection: true }; 
-            dashboard.addCollection('foo', collection)
+            const collection = { IAmAFakeCollection: true, name: () => 'foo' }; 
+            dashboard.addCollection(collection)
             let application = new Application();
             application.dashboard(dashboard);
             assert.deepEqual(application.dashboard().collections(), { foo: collection });
