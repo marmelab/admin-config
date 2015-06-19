@@ -244,7 +244,7 @@ describe('ReadQueries', () => {
              getRawValuesMock = sinon.mock(readQueries);
         });
 
-        it.only('should execute filters function with current search parameter if filters is a function', () => {
+        it('should execute filters function with current search parameter if filters is a function', () => {
             var searchParameter = null;
             var field = new ReferenceField('myField')
                 .targetEntity(humanEntity)
