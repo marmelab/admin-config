@@ -237,4 +237,29 @@ describe('ReadQueries', () => {
             assert(spy.withArgs(targetEntity, viewName, 'listView', 1, perPage, { 'human_id': 1 }, {}, viewName + '.id', 'ASC').calledOnce);
         });
     });
+
+    describe('getAllReferencedData', () => {
+        var getRawValuesMock;
+        beforeEach(function() {
+             getRawValuesMock = sinon.mock(readQueries);
+        });
+
+        it.only('should execute filters function with current search parameter if filters is a function', () => {
+            var searchParameter = null;
+            var field = new ReferenceField('myField')
+                .targetEntity(humanEntity)
+                .targetField(new Field('name'))
+                .filters((search) => { searchParameter = search; return { filter: search }; });
+
+            getRawValuesMock.expects('getRawValues').once();
+            readQueries.getAllReferencedData([field], 'foo');
+
+            getRawValuesMock.verify();
+            assert.equal(searchParameter, 'foo');
+        });
+
+        afterEach(function() {
+            getRawValuesMock.restore();
+        })
+    });
 });
