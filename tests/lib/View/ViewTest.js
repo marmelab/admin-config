@@ -53,6 +53,32 @@ describe('View', function() {
 
             assert.deepEqual({category: category, tags: tags}, view.getReferences());
         });
+
+        it('should return only reference with refresh delay if withRefreshDelay is true', function() {
+            var post = new Entity('post');
+            var category = new ReferenceField('category').refreshDelay(200);
+            var tags = new ReferenceManyField('tags').refreshDelay(null);
+            var view = new View(post).fields([
+                new Field('title'),
+                category,
+                tags
+            ]);
+
+            assert.deepEqual({ category: category }, view.getReferences(true));
+        });
+
+        it('should return only reference with no refresh delay if withRefreshDelay is false', function() {
+            var post = new Entity('post');
+            var category = new ReferenceField('category').refreshDelay(200);
+            var tags = new ReferenceManyField('tags').refreshDelay(null);
+            var view = new View(post).fields([
+                new Field('title'),
+                category,
+                tags
+            ]);
+
+            assert.deepEqual({ tags: tags }, view.getReferences(false));
+        });
     });
 
     describe('addField()', function() {
