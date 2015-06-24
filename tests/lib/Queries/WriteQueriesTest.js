@@ -40,11 +40,11 @@ describe('WriteQueries', () => {
             restWrapper.createOne = sinon.stub().returns(buildPromise({data: rawEntity}));
 
             writeQueries.createOne(view, rawEntity)
-                .then((rawEntry) => {
+                .then(rawEntry => {
                     assert(restWrapper.createOne.calledWith(rawEntity, 'cat', 'http://localhost/cat'));
 
                     let dataStore = new DataStore();
-                    let entry = dataStore.mapEntry(entity.name(), view.identifier(), view.getFields(), rawEntry);
+                    let entry = view.mapEntry(rawEntry);
                     assert.equal(entry.values.data.name, 'Mizu');
                 });
         });
@@ -58,22 +58,22 @@ describe('WriteQueries', () => {
 
         it('should PUT an entity when calling updateOne', () => {
             writeQueries.updateOne(view, rawEntity)
-                .then((rawEntry) => {
+                .then(rawEntry => {
                     assert(restWrapper.updateOne.calledWith(rawEntity, 'cat', 'http://localhost/cat/3'));
 
                     let dataStore = new DataStore();
-                    let entry = dataStore.mapEntry(entity.name(), view.identifier(), view.getFields(), rawEntry);
+                    let entry = view.mapEntry(rawEntry);
                     assert.equal(entry.values.data.name, 'Mizute');
                 });
         });
 
         it('should PUT an entity when calling updateOne with an id', () => {
             writeQueries.updateOne(view, rawEntity, 3)
-                .then((rawEntry) => {
+                .then(rawEntry => {
                     assert(restWrapper.updateOne.calledWith(rawEntity, 'cat', 'http://localhost/cat/3'));
 
                     let dataStore = new DataStore();
-                    let entry = dataStore.mapEntry(entity.name(), view.identifier(), view.getFields(), rawEntry);
+                    let entry = view.mapEntry(rawEntry);
                     assert.equal(entry.values.data.name, 'Mizute');
                 });
         });

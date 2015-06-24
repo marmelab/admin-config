@@ -15,45 +15,6 @@ describe('DataStore', function() {
         dataStore = new DataStore();
     });
 
-    it('should map some raw entities', function () {
-        var view = new View();
-        view
-            .addField(new Field('title'))
-            .setEntity(new Entity().identifier(new Field('post_id')));
-
-        var entries = dataStore.mapEntries(view.entity.name(), view.identifier(), view.getFields(), [
-            { post_id: 1, title: 'Hello', published: true},
-            { post_id: 2, title: 'World', published: false},
-            { post_id: 3, title: 'How to use ng-admin', published: false}
-        ]);
-
-        assert.equal(entries.length, 3);
-        assert.equal(entries[0].identifierValue, 1);
-        assert.equal(entries[1].values.title, 'World');
-        assert.equal(entries[1].values.published, false);
-    });
-
-    it('should map some one entity when the identifier is not in the view', function () {
-        var view = new View(),
-            field = new Field('title'),
-            entity = new Entity('posts');
-
-        view
-            .addField(field)
-            .setEntity(entity);
-
-        entity
-            .identifier(new Field('post_id'));
-
-        var entry = dataStore.mapEntry(entity.name(), view.identifier(), view.getFields(), {
-            post_id: 1,
-            title: 'Hello',
-            published: true
-        });
-        assert.equal(entry.identifierValue, 1);
-        assert.equal(entry.values.title, 'Hello');
-    });
-
     describe('getReferenceChoicesById', function () {
         it('should retrieve choices by id.', function () {
             var ref = new ReferenceField('human_id'),
