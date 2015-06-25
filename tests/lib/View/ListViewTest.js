@@ -26,15 +26,10 @@ describe('ListView', function() {
             assert.deepEqual({category: category}, view.getFilterReferences());
         });
 
-        it('should return only filter reference with refresh delay if withRefreshDelay is true', function() {
+        it('should return only filter reference with refresh complete if withRemoteComplete is true', function() {
             var post = new Entity('post');
-            var category = new ReferenceField('category')
-                .autocomplete(true)
-                .autocompleteOptions({ refreshDelay: 500 });
-
-            var tags = new ReferenceManyField('tags')
-                .autocomplete(true)
-                .autocompleteOptions({ refreshDelay: null });
+            var category = new ReferenceField('category').remoteComplete(true);
+            var tags = new ReferenceManyField('tags').remoteComplete(false);
 
             var view = new ListView(post)
                 .fields([
@@ -48,14 +43,10 @@ describe('ListView', function() {
             assert.deepEqual({category: category}, view.getFilterReferences(true));
         });
 
-        it('should return only filter reference with no refresh delay if withRefreshDelay is false', function() {
+        it('should return only filter reference with no remote complete if withRemoteComplete is set to false', function() {
             var post = new Entity('post');
-            var category = new ReferenceField('category')
-                .autocomplete(true)
-                .autocompleteOptions({ refreshDelay: 500 });
-            var tags = new ReferenceManyField('tags')
-                .autocomplete(true)
-                .autocompleteOptions({ refreshDelay: null });
+            var category = new ReferenceField('category').remoteComplete(true);
+            var tags = new ReferenceManyField('tags').remoteComplete(false);
             var view = new ListView(post)
                 .fields([
                     new Field('title'),
