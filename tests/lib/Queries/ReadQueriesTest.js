@@ -262,4 +262,30 @@ describe('ReadQueries', () => {
             getRawValuesMock.restore();
         })
     });
+
+
+    describe('getRecordsByIds', function() {
+        it('should return a promise with array of all retrieved records', function(done) {
+            var spy = sinon.stub(readQueries, 'getOne', function(entity, viewType, identifierValue) {
+                return buildPromise({ result: identifierValue });
+            });
+
+            readQueries.getRecordsByIds(humanEntity, [1, 2]).then(function(records) {
+                assert.equal(spy.callCount, 2);
+                assert.equal(spy.args[0][2], 1);
+                assert.equal(spy.args[1][2], 2);
+                done();
+            });
+        });
+
+        it('should return promise with empty result if no ids are passed', function(done) {
+            var spy = sinon.spy(readQueries, 'getRawValues');
+
+            readQueries.getRecordsByIds(humanEntity, []).then(function(records) {
+                assert.equal(spy.called, false);
+                assert.equal(records, null);
+                done();
+            });
+        });
+    });
 });
