@@ -56,8 +56,12 @@ describe('View', function() {
 
         it('should return only reference with refresh delay if withRefreshDelay is true', function() {
             var post = new Entity('post');
-            var category = new ReferenceField('category').refreshDelay(200);
-            var tags = new ReferenceManyField('tags').refreshDelay(null);
+            var category = new ReferenceField('category')
+                .autocomplete(true)
+                .autocompleteOptions({ refreshDelay: 200 });
+            var tags = new ReferenceManyField('tags')
+                .autocomplete(true)
+                .autocompleteOptions({ refreshDelay: null });
             var view = new View(post).fields([
                 new Field('title'),
                 category,
@@ -69,8 +73,12 @@ describe('View', function() {
 
         it('should return only reference with no refresh delay if withRefreshDelay is false', function() {
             var post = new Entity('post');
-            var category = new ReferenceField('category').refreshDelay(200);
-            var tags = new ReferenceManyField('tags').refreshDelay(null);
+            var category = new ReferenceField('category')
+                .autocomplete(true)
+                .autocompleteOptions({ refreshDelay: 200 });
+            var tags = new ReferenceManyField('tags')
+                .autocomplete(true)
+                .autocompleteOptions({ refreshDelay: null });
             var view = new View(post).fields([
                 new Field('title'),
                 category,

@@ -28,8 +28,14 @@ describe('ListView', function() {
 
         it('should return only filter reference with refresh delay if withRefreshDelay is true', function() {
             var post = new Entity('post');
-            var category = new ReferenceField('category').refreshDelay(500);
-            var tags = new ReferenceManyField('tags').refreshDelay(null);
+            var category = new ReferenceField('category')
+                .autocomplete(true)
+                .autocompleteOptions({ refreshDelay: 500 });
+
+            var tags = new ReferenceManyField('tags')
+                .autocomplete(true)
+                .autocompleteOptions({ refreshDelay: null });
+
             var view = new ListView(post)
                 .fields([
                     new Field('title'),
@@ -44,8 +50,12 @@ describe('ListView', function() {
 
         it('should return only filter reference with no refresh delay if withRefreshDelay is false', function() {
             var post = new Entity('post');
-            var category = new ReferenceField('category').refreshDelay(500);
-            var tags = new ReferenceManyField('tags').refreshDelay(null);
+            var category = new ReferenceField('category')
+                .autocomplete(true)
+                .autocompleteOptions({ refreshDelay: 500 });
+            var tags = new ReferenceManyField('tags')
+                .autocomplete(true)
+                .autocompleteOptions({ refreshDelay: null });
             var view = new ListView(post)
                 .fields([
                     new Field('title'),
