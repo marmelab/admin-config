@@ -91,14 +91,28 @@ describe('WriteQueries', () => {
     });
 
     describe("batchDelete", () => {
-        it('should DELETE entities when calling batchEntities', () => {
+        it('should DELETE entities one by one when calling batchEntities', () => {
+            let batchDeleteView = entity.views["BatchDeleteView"];
             restWrapper.deleteOne = sinon.stub().returns(buildPromise({}));
 
-            writeQueries.batchDelete(view, [1, 2])
+            writeQueries.batchDelete(batchDeleteView, [1, 2])
                 .then(() => {
                     assert(restWrapper.deleteOne.calledTwice);
                     assert(restWrapper.deleteOne.calledWith('cat', 'http://localhost/cat/1'));
                     assert(restWrapper.deleteOne.calledWith('cat', 'http://localhost/cat/2'));
+                });
+        });
+        it('should DELETE entities in a single request when calling batchEntities with a singleApiCall option', () => {
+            let batchDeleteView = entity.views["BatchDeleteView"]
+                .singleApiCall(function (ids) {
+                  return { 'id[]': ids };
+                });
+            restWrapper.deleteAll = sinon.stub().returns(buildPromise({}));
+
+            writeQueries.batchDelete(batchDeleteView, [1, 2])
+                .then(() => {
+                    assert(restWrapper.deleteAll.calledOnce);
+                    assert(restWrapper.deleteAll.calledWith('cat', 'http://localhost/cat', { _filters: { 'id[]': [ 1, 2 ] } }));
                 });
         });
     });
