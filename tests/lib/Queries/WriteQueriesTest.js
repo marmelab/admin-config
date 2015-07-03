@@ -45,7 +45,7 @@ describe('WriteQueries', () => {
 
                     let dataStore = new DataStore();
                     let entry = view.mapEntry(rawEntry);
-                    assert.equal(entry.values.data.name, 'Mizu');
+                    assert.equal(entry.values['data.name'], 'Mizu');
                 });
         });
     });
@@ -63,7 +63,7 @@ describe('WriteQueries', () => {
 
                     let dataStore = new DataStore();
                     let entry = view.mapEntry(rawEntry);
-                    assert.equal(entry.values.data.name, 'Mizute');
+                    assert.equal(entry.values['data.name'], 'Mizute');
                 });
         });
 
@@ -74,7 +74,7 @@ describe('WriteQueries', () => {
 
                     let dataStore = new DataStore();
                     let entry = view.mapEntry(rawEntry);
-                    assert.equal(entry.values.data.name, 'Mizute');
+                    assert.equal(entry.values['data.name'], 'Mizute');
                 });
         });
     });
