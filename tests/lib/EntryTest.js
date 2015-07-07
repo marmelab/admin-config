@@ -7,7 +7,7 @@ import ReferenceManyField from "../../lib/Field/ReferenceManyField";
 
 describe('Entry', function() {
 
-    describe('mapFromRest()', function() {
+    describe('createFromRest()', function() {
         var entity, fields;
 
         beforeEach(function() {
@@ -20,13 +20,13 @@ describe('Entry', function() {
 
         it('should return entry with no value if REST entry is empty', function() {
             var view = entity.listView();
-            var mappedEntry = Entry.mapFromRest({}, view.getFields(), entity.name(), view.identifier().name());
+            var mappedEntry = Entry.createFromRest({}, view.getFields(), entity.name(), view.identifier().name());
             assert.deepEqual({}, mappedEntry.values);
         });
 
         it('should map each value to related field if existing', function() {
             var view = entity.listView();
-            var mappedEntry = Entry.mapFromRest({
+            var mappedEntry = Entry.createFromRest({
                 id: 1,
                 title: 'ng-admin + ES6 = pure awesomeness!',
                 body: 'Really, it rocks!',
@@ -43,7 +43,7 @@ describe('Entry', function() {
 
         it('should set as identifierValue value for identifier field', function() {
             var view = entity.listView();
-            var mappedEntry = Entry.mapFromRest({ id: 1 }, view.getFields(), entity.name(), view.identifier().name());
+            var mappedEntry = Entry.createFromRest({ id: 1 }, view.getFields(), entity.name(), view.identifier().name());
             assert.equal(1, mappedEntry.identifierValue);
         });
     });
