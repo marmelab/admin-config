@@ -23,6 +23,16 @@ describe('cloneAndFlatten()', () => {
         assert.deepEqual(cloneAndFlatten({ a: 1, b: { c: 2 }, d: { e: 3, f: { g: 4, h: 5 } } }),
                                          { a: 1, 'b.c': 2, 'd.e': 3, 'd.f.g': 4, 'd.f.h': 5 })
     );
+    it('should not flatten arrays', () =>
+        assert.deepEqual(cloneAndFlatten({ a: [1, 2, 3] }), { a: [1, 2, 3]})
+    );
+    it('should not flatten strings', () =>
+        assert.deepEqual(cloneAndFlatten({ a: "hello, world" }), { a: "hello, world" })
+    );
+    it('should not flatten dates', () => {
+        let d = new Date();
+        assert.deepEqual(cloneAndFlatten({ a: d }), { a: d })
+    });
 });
 
 describe('cloneAndNest()', () => {
