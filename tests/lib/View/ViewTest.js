@@ -214,11 +214,122 @@ describe('View', function() {
         });
     });
 
-    it('should return the identifier.', function () {
-        var entity = new Entity('post').identifier(new Field('post_id'));
-        var view = entity.listView();
-        view.addField(new Field('name'));
+    describe('mapEntry()', () => {
 
-        assert.equal(view.identifier().name(), 'post_id');
+        it('should return an entry', () => {
+            let view = new View();
+            view.setEntity(new Entity().name('Foo'));
+            assert.instanceOf(view.mapEntry(), Entry);
+            assert.equal(view.mapEntry().entityName, 'Foo');
+        });
+
+        it('should return an empty entry when passed an empty object', () => {
+            let view = new View();
+            view.setEntity(new Entity().name('Foo'));
+            assert.deepEqual(view.mapEntry({}).values, {});
+        });
+
+        it('should use default values when passed an empty object', () => {
+            let view = new View();
+            view.setEntity(new Entity().name('Foo'));
+            view.fields([
+                new Field('foo').defaultValue('bar')
+            ]);
+            assert.equal(view.mapEntry({}).values.foo, 'bar');
+        });
+
+        it('should not use default values when passed a non-empty object', () => {
+            let view = new View();
+            view.setEntity(new Entity().name('Foo'));
+            view.fields([
+                new Field('foo').defaultValue('bar')
+            ]);
+            assert.notEqual(view.mapEntry({ hello: 1 }).values.foo, 'bar');
+        });
+
+        it('should populate the entry based on the values passed as argument', () => {
+            let view = new View();
+            view.setEntity(new Entity().name('Foo'));
+            let entry = view.mapEntry({ hello: 1, world: 2 });
+            assert.equal(entry.values.hello, 1);
+            assert.equal(entry.values.world, 2);
+        });
+
+        it('should set the entry identifier value by default', () => {
+            let view = new View();
+            view.setEntity(new Entity().name('Foo'));
+            assert.equal(view.mapEntry({ id: 1, bar: 2 }).identifierValue, 1);
+        });
+
+        it('should set the entry identifier value according to the fields', () => {
+            let view = new View();
+            view.setEntity(new Entity().name('Foo').identifier(new Field('bar')));
+            assert.equal(view.mapEntry({ id: 1, bar: 2 }).identifierValue, 2);
+        });
+
+        it('should transform the object values using the fields map functions', () => {
+            let view = new View();
+            view.setEntity(new Entity().name('Foo'));
+            view.fields([
+                new Field('foo').map(v => v - 1)
+            ]);
+            assert.equal(view.mapEntry({ foo: 2 }).values.foo, 1);
+        })
+    });
+
+    describe('mapEntries()', () => {
+        it('should return entries based on an array of objects', function () {
+            let view = new View();
+            view
+                .addField(new Field('title'))
+                .setEntity(new Entity().identifier(new Field('post_id')));
+
+            let entries = view.mapEntries([
+                { post_id: 1, title: 'Hello', published: true},
+                { post_id: 2, title: 'World', published: false},
+                { post_id: 3, title: 'How to use ng-admin', published: false}
+            ]);
+
+            assert.equal(entries.length, 3);
+            assert.equal(entries[0].identifierValue, 1);
+            assert.equal(entries[1].values.title, 'World');
+            assert.equal(entries[1].values.published, false);
+        });
+    });
+
+    describe('transformEntry()', () => {
+
+        it('should return an empty object for empty entries', () => {
+            let view = new View();
+            let entry = new Entry();
+            assert.deepEqual(view.transformEntry(entry), {});
+        });
+
+        it('should return an object litteral based on the entry values', () => {
+            let view = new View();
+            let entry = new Entry('foo', { id: 1, bar: 2 }, 1);
+            assert.deepEqual(view.transformEntry(entry), { id: 1, bar: 2 });
+        });
+
+        it('should transform the entry values using the fields transform functions', () => {
+            let view = new View();
+            view.setEntity(new Entity().name('Foo'));
+            view.fields([
+                new Field('bar').transform(v => v - 1)
+            ]);
+            let entry = new Entry('foo', { id: 1, bar: 2 }, 1);
+            assert.deepEqual(view.transformEntry(entry), { id: 1, bar: 1 });
+
+        });
+    });
+
+    describe('identifier()', function() {
+        it('should return the identifier.', function () {
+            var entity = new Entity('post').identifier(new Field('post_id'));
+            var view = entity.listView();
+            view.addField(new Field('name'));
+
+            assert.equal(view.identifier().name(), 'post_id');
+        });
     });
 });
