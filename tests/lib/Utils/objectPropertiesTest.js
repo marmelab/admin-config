@@ -33,6 +33,10 @@ describe('cloneAndFlatten()', () => {
         let d = new Date();
         assert.deepEqual(cloneAndFlatten({ a: d }), { a: d })
     });
+    it('should not flatten excluded properties', () =>
+        assert.deepEqual(cloneAndFlatten({ a: 1, b: { c: 2 }, d: { e: 3, f: { g: 4, h: 5 } } }, ['d']),
+                                         { a: 1, 'b.c': 2, d: { e: 3, f: { g: 4, h: 5 } } })
+    );
 });
 
 describe('cloneAndNest()', () => {
