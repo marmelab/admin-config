@@ -87,6 +87,30 @@ describe('Entity', function() {
         });
     });
 
+    describe('retrieveMethod', function() {
+        it('should return given retrieveMethod if already set', function() {
+            var post = new Entity('post').retrieveMethod('post');
+            assert.equal('post', post.retrieveMethod());
+        });
+
+        it('should return null if no retrieveMethod has been set', function() {
+            var post = new Entity('post');
+            assert.equal(null, post.retrieveMethod());
+        });
+    });
+
+    describe('deleteMethod', function() {
+        it('should return given deleteMethod if already set', function() {
+            var post = new Entity('post').deleteMethod('post');
+            assert.equal('post', post.deleteMethod());
+        });
+
+        it('should return null if no deleteMethod has been set', function() {
+            var post = new Entity('post');
+            assert.equal(null, post.deleteMethod());
+        });
+    });
+
     describe('identifier', function() {
         it('should set default identifier', function() {
             var post = new Entity('post');
