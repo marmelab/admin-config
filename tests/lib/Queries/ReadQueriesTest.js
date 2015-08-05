@@ -123,13 +123,34 @@ describe('ReadQueries', () => {
             let viewName = catView.name();
 
             readQueries.getAll(catView, 1);
-            readQueries.getAll(catView, 1, [], 'unknow_ListView.name', 'ASC');
-            readQueries.getAll(catView, 1, [], viewName + '.id', 'ASC');
+            readQueries.getAll(catView, 1, {}, 'unknow_ListView.name', 'ASC');
+            readQueries.getAll(catView, 1, {}, viewName + '.id', 'ASC');
 
-            assert(spy.withArgs(catEntity, viewName, catView.type, 1, catView.perPage(), undefined, catView.filters(), viewName + '.name', 'DESC').calledOnce);
-            assert(spy.withArgs(catEntity, viewName, catView.type, 1, catView.perPage(), [], catView.filters(), viewName + '.name', 'DESC').calledOnce);
-            assert(spy.withArgs(catEntity, viewName, catView.type, 1, catView.perPage(), [], catView.filters(), viewName + '.id', 'ASC').calledOnce);
+            assert(spy.withArgs(catEntity, viewName, catView.type, 1, catView.perPage(), {}, catView.filters(), viewName + '.name', 'DESC').callCount == 2);
+            assert(spy.withArgs(catEntity, viewName, catView.type, 1, catView.perPage(), {}, catView.filters(), viewName + '.id', 'ASC').calledOnce);
         });
+
+        it('should send correct filter params to the API call', () => {
+            let spy = sinon.spy(readQueries, 'getRawValues');
+            let entity = new Entity('cat');
+
+            readQueries.getAll(entity.listView(), 1, { name: 'foo'});
+
+            assert(spy.withArgs(entity, 'cat_ListView', 'ListView', 1, 30, { name: 'foo' }, [], 'cat_ListView.id', 'DESC').calledOnce);
+        });
+
+        it('should include permanent filters', () => {
+            let spy = sinon.spy(readQueries, 'getRawValues');
+            let entity = new Entity('cat');
+            entity.listView().permanentFilters({ bar: 1 });
+
+            readQueries.getAll(entity.listView(), 1);
+            readQueries.getAll(entity.listView(), 1, { name: 'foo'});
+
+            assert(spy.withArgs(entity, 'cat_ListView', 'ListView', 1, 30, { bar: 1 }, [], 'cat_ListView.id', 'DESC').calledOnce);
+            assert(spy.withArgs(entity, 'cat_ListView', 'ListView', 1, 30, { name: 'foo', bar: 1 }, [], 'cat_ListView.id', 'DESC').calledOnce);
+        });
+
     });
 
     describe('getReferencedData', () => {
@@ -244,12 +265,12 @@ describe('ReadQueries', () => {
              getRawValuesMock = sinon.mock(readQueries);
         });
 
-        it('should execute filters function with current search parameter if filters is a function', () => {
+        it('should execute permanentFilters function with current search parameter if filters is a function', () => {
             var searchParameter = null;
             var field = new ReferenceField('myField')
                 .targetEntity(humanEntity)
                 .targetField(new Field('name'))
-                .filters((search) => { searchParameter = search; return { filter: search }; });
+                .permanentFilters((search) => { searchParameter = search; return { filter: search }; });
 
             getRawValuesMock.expects('getRawValues').once();
             readQueries.getAllReferencedData([field], 'foo');
