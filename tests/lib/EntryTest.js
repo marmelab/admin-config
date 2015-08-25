@@ -49,6 +49,17 @@ describe('Entry', function() {
             }, mappedEntry.values);
         });
 
+        it('should map even if the value is absent', () => {
+            var fields = [new Field('foo').map((v,e) => e.tags.join(' '))];
+            var mappedEntry = Entry.createFromRest({
+                tags: [1, 2, 3, 4]
+            }, fields);
+            assert.deepEqual({
+                foo: '1 2 3 4',
+                tags: [1, 2, 3, 4]
+            }, mappedEntry.values)
+        });
+
         it('should set as identifierValue value for identifier field', () => {
             var mappedEntry = Entry.createFromRest({ id: 1 });
             assert.equal(1, mappedEntry.identifierValue);
