@@ -19,7 +19,7 @@ var NumberField = require('admin-config/lib/Field/NumberField');
 import NumberField from "admin-config/lib/Field/NumberField";
 ```
 
-Admin-config is written in ES6. You'll need a transpiler to use any of the classes (we recommend [Webpack](http://webpack.github.io/), using, for instance, [babel](https://babeljs.io/) to convert it to ES5. Here is an example Webpack configuration for that:
+Admin-config is written in ES6. You'll need a transpiler to use any of the classes (we recommend [Webpack](http://webpack.github.io/) and [babel](https://babeljs.io/)). Here is an example Webpack configuration:
 
 ```js
 module.exports = {
