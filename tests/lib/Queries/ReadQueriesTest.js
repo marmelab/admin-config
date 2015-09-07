@@ -257,6 +257,39 @@ describe('ReadQueries', () => {
             assert(spy.withArgs(catEntity, viewName, 'listView', 1, perPage, { 'human_id': 1 }, {}, viewName + '.name', 'DESC').calledTwice);
             assert(spy.withArgs(targetEntity, viewName, 'listView', 1, perPage, { 'human_id': 1 }, {}, viewName + '.id', 'ASC').calledOnce);
         });
+
+        it('should append permanentFilters to the queryString', () => {
+            let readQueries = new ReadQueries(restWrapper, PromisesResolver, application);
+            const commentEntity = new Entity('comment');
+            const postEntity = new Entity('post');
+            const postView = postEntity.showView()
+                .fields([
+                    new Field('name'),
+                    new ReferencedListField('comments')
+                        .targetEntity(commentEntity)
+                        .targetReferenceField('post_id')
+                        .permanentFilters({ foo: 'bar' })
+                ]);
+
+            const comments = [
+                { id: 1, post_id: 1, summary: "A comment", foo: "bar" },
+                { id: 2, post_id: 1, summary: "Another comment" }
+            ];
+            var post = { id: 1, title: "Hello, World" };
+
+            var spy = sinon.stub(readQueries, 'getRawValues', function(entity, viewType, identifierValue) {
+                return buildPromise({ result: post });
+            });
+            PromisesResolver.allEvenFailed = sinon.stub().returns(buildPromise([
+                { status: 'success', result: { data: [comments[0]] } }
+            ]));
+
+            readQueries.getReferencedListData(postView.getReferencedLists(), null, null, 1)
+                .then((referencedListEntries) => {
+                    let targetEntity = postView.getReferencedLists()['comments'].targetEntity();
+                    assert(spy.withArgs(commentEntity, 'comment_ListView', 'listView', 1, 30, { post_id: 1, foo: 'bar' }, {}).calledOnce);
+                });
+        });
     });
 
     describe('getAllReferencedData', () => {
