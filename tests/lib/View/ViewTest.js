@@ -212,6 +212,34 @@ describe('View', function() {
 
             assert.throw(function () { view.validate(entry); }, Error, 'Field "Complex" is not valid.');
         });
+        
+        it('should validate conditionally', function () {
+            var entry = new Entry(),
+                view = new View('myView'),
+                field1 = new Field('status'),
+                field2 = new Field('name');
+
+            entry.values = {
+                status: 'active',
+                name: ''
+            };
+
+            view.addField(field1).addField(field2);
+
+            field2.validation().validator = function (value, values) {
+                if (values['status'] == 'active' && value == '') {
+                    throw new Error('If status is active name can not be blank.');
+                }
+
+                return true;
+            };
+
+            assert.throw(function () { view.validate(entry); }, Error, 'If status is active name can not be blank.');
+
+            entry.values.status = 'inactive';
+
+            assert.equal(view.validate(entry), undefined);
+        });
     });
 
     describe('mapEntry()', () => {
