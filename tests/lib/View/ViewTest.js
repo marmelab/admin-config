@@ -212,6 +212,49 @@ describe('View', function() {
 
             assert.throw(function () { view.validate(entry); }, Error, 'Field "Complex" is not valid.');
         });
+
+        it('should call validator with the targeted field as first parameter', function (done) {
+            var entry = new Entry(),
+                view = new View('myView'),
+                field1 = new Field('field1').label('field1');
+
+            entry.values = {
+                field1: "field1_value",
+            };
+
+            view.addField(field1);
+
+            field1.validation().validator = function (value) {
+                assert.equal("field1_value", value);
+                done();
+            };
+
+            view.validate(entry);
+        });
+
+        it('should call validator with the all other fields as second parameter', function (done) {
+            var entry = new Entry(),
+                view = new View('myView'),
+                field1 = new Field('field1').label('field1'),
+                field2 = new Field('field2').label('field2');
+
+            entry.values = {
+                field1: "field1_value",
+                field2: "field2_value",
+            };
+
+            view.addField(field1).addField(field2);
+
+            field1.validation().validator = function (value, all) {
+                assert.deepEqual({
+                    field1: "field1_value",
+                    field2: "field2_value",
+                }, all);
+                done();
+            };
+
+            view.validate(entry);
+        });
     });
 
     describe('mapEntry()', () => {
