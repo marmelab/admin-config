@@ -219,7 +219,7 @@ describe('ReadQueries', () => {
                 {status: 'success', result: { data: rawAuthors }}
             ]));
 
-            readQueries.getOptimizedReferencedData(post.views["ListView"].getReferences(), rawPosts)
+            readQueries.getOptimizedReferenceData(post.views["ListView"].getReferences(), rawPosts)
                 .then((referencedData) => {
                     assert.equal(referencedData['author'].length, 2);
                     assert.equal(referencedData['author'][0].id, 'abc');
