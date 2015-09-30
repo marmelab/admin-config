@@ -62,4 +62,24 @@ describe('Field', function() {
             assert.equal("important approved", field.getCssClasses());
         });
     });
+
+    describe('template()', function() {
+        it('should accept string values', function () {
+            var field = new Field().template('hello!');
+            assert.equal(field.getTemplateValue(), 'hello!');
+        });
+
+        it('should accept function values', function () {
+            var field = new Field().template(function () { return 'hello function !'; });
+            assert.equal(field.getTemplateValue(), 'hello function !');
+        });
+    });
+
+    describe('getTemplateValue()', function() {
+        it('should return the template function executed with the supplied data', function() {
+            var field = new Field().template(function (name) { return 'hello ' + name + ' !'; });
+            assert.equal(field.getTemplateValue('John'), 'hello John !');
+        });
+    });
+
 });
