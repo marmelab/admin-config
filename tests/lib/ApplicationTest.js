@@ -16,6 +16,13 @@ describe('Application', function() {
             assert.equal('posts/12', application.getRouteFor(entity, view.getUrl(12), view.type, 12, view.identifier()));
         });
 
+        it('should work for zero indentifier', function() {
+            var application = new Application();
+            var entity = new Entity('posts');
+            application.addEntity(entity);
+            assert.equal('posts/0', application.getRouteFor(entity, null, null, 0, null));
+        });
+
         it('should use the application baseApiUrl when provided', function() {
             var application = new Application();
             application.baseApiUrl('/foo/');
@@ -231,7 +238,7 @@ describe('Application', function() {
 
         it('should serve as a setter', () => {
             let dashboard = new Dashboard();
-            const collection = { IAmAFakeCollection: true, name: () => 'foo' }; 
+            const collection = { IAmAFakeCollection: true, name: () => 'foo' };
             dashboard.addCollection(collection)
             let application = new Application();
             application.dashboard(dashboard);
@@ -270,7 +277,7 @@ describe('Application', function() {
                     new Field('field1'),
                     new Field('field2'),
                     new Field('field3'),
-                    new Field('field4')                    
+                    new Field('field4')
                 ];
 
             comment.listView().fields(fields);
