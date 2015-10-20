@@ -53,6 +53,32 @@ describe('View', function() {
 
             assert.deepEqual({category: category, tags: tags}, view.getReferences());
         });
+
+        it('should return only reference with remote complete if withRemoteComplete is true', function() {
+            var post = new Entity('post');
+            var category = new ReferenceField('category').remoteComplete(true);
+            var tags = new ReferenceManyField('tags').remoteComplete(false);
+            var view = new View(post).fields([
+                new Field('title'),
+                category,
+                tags
+            ]);
+
+            assert.deepEqual({ category: category }, view.getReferences(true));
+        });
+
+        it('should return only reference with no remote complete if withRemoteComplete is false', function() {
+            var post = new Entity('post');
+            var category = new ReferenceField('category').remoteComplete(true);
+            var tags = new ReferenceManyField('tags').remoteComplete(false);
+            var view = new View(post).fields([
+                new Field('title'),
+                category,
+                tags
+            ]);
+
+            assert.deepEqual({ tags: tags }, view.getReferences(false));
+        });
     });
 
     describe('addField()', function() {
