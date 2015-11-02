@@ -81,5 +81,4 @@ describe('Field', function() {
             assert.equal(field.getTemplateValue('John'), 'hello John !');
         });
     });
-
 });
