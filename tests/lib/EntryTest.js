@@ -111,20 +111,17 @@ describe('Entry', function() {
     });
 
     describe('transformToRest()', function() {
-        it('should provide both the value and entry when invoking the callback', (done) => {
+        it('should provide both the value and entry when invoking the callback', () => {
             var field = new Field('foo');
             field.defaultValue(2);
+
             var entry = Entry.createForFields([field]);
 
             field.transform((value, entry) => {
+                assert.equal(value, 2);
                 assert.deepEqual(entry, {foo: 2});
-                entry.bar = 1;
             });
-            field.transform((value, entry) => {
-                assert.deepEqual(entry, {foo: 2, bar: 1});
 
-                done();
-            });
             entry.transformToRest([field]);
         });
     });
