@@ -6,6 +6,26 @@ import Field from "../../lib/Field/Field";
 import Dashboard from "../../lib/Dashboard";
 
 describe('Application', function() {
+    describe('entity', function () {
+        it('should store entity by name.', function () {
+            var app = new Application(),
+                entity = new Entity('myEntity');
+            app.addEntity(entity);
+
+            assert.equal(app.getEntity('myEntity').name(), 'myEntity');
+            assert.equal(app.getEntity('myEntity').order(), 0);
+            assert.equal(app.hasEntity('myEntity'), true);
+        });
+
+        it('should return all entity names.', function () {
+            var app = new Application();
+            app.addEntity(new Entity('myEntity1'));
+            app.addEntity(new Entity('myEntity2'));
+
+            assert.deepEqual(app.getEntityNames(), ['myEntity1', 'myEntity2']);
+        });
+    });
+
     describe('getRouteFor', function() {
         it('should return entity name by default', function() {
             var application = new Application();
@@ -102,6 +122,101 @@ describe('Application', function() {
             assert.equal('http://bar/baz/12', application.getRouteFor(entity, view.getUrl(12), view.type, 12));
         });
 
+        it('should return the url specified in a view', function () {
+            var app = new Application(),
+                entity1 = new Entity('myEntity1'),
+                view = entity1.dashboardView();
+
+            view.url('http://localhost/dashboard');
+            app.addEntity(entity1);
+
+            assert.equal(app.getRouteFor(entity1, view.getUrl(), view.type), 'http://localhost/dashboard');
+        });
+
+        it('should not consider protocol relative URL as a relative path', function () {
+            var app = new Application(),
+                entity1 = new Entity('myEntity1'),
+                view = entity1.dashboardView();
+
+            view.url('//localhost/dashboard');
+            app.addEntity(entity1);
+
+            assert.equal(app.getRouteFor(entity1, view.getUrl(), view.type), '//localhost/dashboard');
+        });
+
+        it('should return the url specified in the entity when the URL is not specified in the view', function () {
+            var app = new Application(),
+                entity1 = new Entity('comments'),
+                view = entity1.dashboardView();
+
+            entity1.baseApiUrl('http://api.com/');
+            app.addEntity(entity1);
+
+            assert.equal(app.getRouteFor(entity1, view.getUrl(), view.type), 'http://api.com/comments');
+        });
+
+        it('should return the url specified in the entity when the app also define a base URL', function () {
+            var app = new Application(),
+                entity1 = new Entity('comments'),
+                view = entity1.dashboardView();
+
+            entity1.baseApiUrl('//api.com/');
+            app.baseApiUrl('http://api-entity.com/');
+            app.addEntity(entity1);
+
+            assert.equal(app.getRouteFor(entity1, view.getUrl(), view.type), '//api.com/comments');
+        });
+
+        it('should return the url specified in the app when the URL is not specified in the view nor in the entity', function () {
+            var app = new Application(),
+                entity1 = new Entity('comments'),
+                view = entity1.dashboardView();
+
+            app.baseApiUrl('https://elastic.local/');
+            app.addEntity(entity1);
+
+            assert.equal(app.getRouteFor(entity1, view.getUrl(), view.type), 'https://elastic.local/comments');
+        });
+
+        it('should call url() defined in the view if it\'s a function', function () {
+            var app = new Application(),
+                entity1 = new Entity('comments'),
+                view = entity1.editionView();
+
+            app.baseApiUrl('http://api.local');
+
+            view.url(function (entityId) {
+                return '/post/:' + entityId;
+            });
+
+            assert.equal(app.getRouteFor(entity1, view.getUrl(1), view.type, 1, view.identifier()), 'http://api.local/post/:1');
+        });
+
+        it('should call url() defined in the entity if it\'s a function', function () {
+            var app = new Application(),
+                entity1 = new Entity('comments'),
+                view = entity1.editionView();
+
+            app.baseApiUrl('http://api.local');
+
+            entity1.url(function (entityName, viewType, identifierValue) {
+                return '/' + entityName + '_' + viewType + '/:' + identifierValue;
+            });
+
+            assert.equal(app.getRouteFor(entity1, view.getUrl(1), view.type, 1, view.identifier()), 'http://api.local/comments_EditView/:1');
+        });
+
+        it('should not prepend baseApiUrl when the URL begins with http', function () {
+            var app = new Application(),
+                entity1 = new Entity('comments'),
+                view = entity1.editionView();
+
+            app.baseApiUrl('http://api.local');
+
+            entity1.url('http://mock.local/entity');
+
+            assert.equal(app.getRouteFor(entity1, view.getUrl(1), view.type, 1, view.identifier()), 'http://mock.local/entity');
+        });
     });
 
     describe('getViewsOfType', () => {
@@ -291,6 +406,90 @@ describe('Application', function() {
             assert.notProperty(dashboard.collections(), 'post');
             let commentCollection = dashboard.collections().comment;
             assert.deepEqual(commentCollection.fields(), fields.filter((el, i) => i < 3));
+        });
+    });
+
+    describe('getErrorMessageFor', function () {
+        it('should return the global message with a simple string as body', function () {
+            var app = new Application(),
+                entity = new Entity(),
+                response = {
+                    status: 500,
+                    data: 'myBody'
+                };
+
+            app.addEntity(entity);
+
+            assert.equal(app.getErrorMessageFor(entity.creationView(), response), 'Oops, an error occured : (code: 500) myBody');
+        });
+
+        it('should return the global message with an object as body', function () {
+            var app = new Application(),
+                entity = new Entity(),
+                response = {
+                    status: 500,
+                    data: {
+                        error: 'Internal error'
+                    }
+                };
+
+            app.addEntity(entity);
+
+            assert.equal(app.getErrorMessageFor(entity.listView(), response), 'Oops, an error occured : (code: 500) {"error":"Internal error"}');
+        });
+
+        it('should return the error message defined globally', function () {
+            var app = new Application(),
+                entity = new Entity(),
+                response = {
+                    status: 500
+                };
+
+            app.errorMessage(function (response) {
+                return 'Global error: ' + response.status;
+            });
+
+            app.addEntity(entity);
+
+            assert.equal(app.getErrorMessageFor(entity.listView(), response), 'Global error: 500');
+        });
+
+        it('should return the message defined by the entity', function () {
+            var app = new Application(),
+                entity = new Entity(),
+                response = {
+                    status: 500,
+                    data: {
+                        error: 'Internal error'
+                    }
+                };
+
+            entity.errorMessage(function (response) {
+                return 'error: ' + response.status;
+            });
+
+            app.addEntity(entity);
+
+            assert.equal(app.getErrorMessageFor(entity.listView(), response), 'error: 500');
+        });
+
+        it('should return the message defined by the view', function () {
+            var app = new Application(),
+                entity = new Entity(),
+                response = {
+                    status: 500,
+                    data: {
+                        error: 'Internal error'
+                    }
+                };
+
+            entity.listView().errorMessage(function (response) {
+                return 'Error during listing: ' + response.status;
+            });
+
+            app.addEntity(entity);
+
+            assert.equal(app.getErrorMessageFor(entity.listView(), response), 'Error during listing: 500');
         });
     });
 });
