@@ -60,4 +60,7 @@ describe('cloneAndNest()', () => {
         assert.deepEqual(cloneAndNest({ a: 1, 'b.c': 2, 'd.e': 3, 'd.f.g': 4, 'd.f.h': 5 }),
                                       { a: 1, b: { c: 2 }, d: { e: 3, f: { g: 4, h: 5 } } })
     );
+    it('should not error on null nested objects', () =>
+        cloneAndNest({ a: null, 'a.b': null })
+    );
 });
