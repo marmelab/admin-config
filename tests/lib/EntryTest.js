@@ -109,4 +109,20 @@ describe('Entry', function() {
             }, mappedEntry.values);
         })
     });
+
+    describe('transformToRest()', function() {
+        it('should provide both the value and entry when invoking the callback', () => {
+            var field = new Field('foo');
+            field.defaultValue(2);
+
+            var entry = Entry.createForFields([field]);
+
+            field.transform((value, entry) => {
+                assert.equal(value, 2);
+                assert.deepEqual(entry, {foo: 2});
+            });
+
+            entry.transformToRest([field]);
+        });
+    });
 });
