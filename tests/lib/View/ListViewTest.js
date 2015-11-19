@@ -3,6 +3,7 @@
 var assert = require('chai').assert;
 
 import Entity from '../../../lib/Entity/Entity';
+import Entry from '../../../lib/Entry';
 import Field from '../../../lib/Field/Field';
 import ReferenceField from '../../../lib/Field/ReferenceField';
 import ReferenceManyField from '../../../lib/Field/ReferenceManyField';
@@ -93,4 +94,37 @@ describe('ListView', function() {
             assert.deepEqual({ tags: tags }, view.getReferences(false));
         });
     });
+
+    describe('getEntryCssClasses', function() {
+        var view;
+
+        beforeEach(function() {
+            view = new ListView(new Entity('post'));
+        });
+
+        it('should return result of callback called with entry if function', function() {
+            view.entryCssClasses(entry => entry.values.id % 2 ? "odd-entry" : "even-entry");
+
+            var entry = new Entry('post', { id: 1 });
+            assert.equal("odd-entry", view.getEntryCssClasses(entry));
+
+            entry = new Entry('post', { id: 2 });
+            assert.equal("even-entry", view.getEntryCssClasses(entry));
+        });
+
+        it('should concatenate all elements if array', function() {
+            view.entryCssClasses(["important", "approved"]);
+            assert.equal("important approved", view.getEntryCssClasses());
+        });
+
+        it('should return passed classes if neither function nor array', function() {
+            view.entryCssClasses("important approved");
+            assert.equal("important approved", view.getEntryCssClasses());
+        });
+
+        it('should return an empty string by default', function() {
+            assert.equal(view.getEntryCssClasses(), '');
+        });
+    });
+
 });
