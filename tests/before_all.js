@@ -13,8 +13,6 @@ beforeEach(function() {
             "Don't use for..in to enumerate Array properties, as users are free to " +
             "add entries to the Array prototype, for example for polyfills. " +
             "You should instead use\n" +
-            "  for (let i in xs) { if (!xs.hasOwnProperty(i)) continue; var x = xs[i]; ... }\n" +
-            "or\n" +
-            "  for (let x of xs) { ... }";
+            "  for (let i in xs) { if (!xs.hasOwnProperty(i)) continue; var x = xs[i]; ... }";
     }
 });
