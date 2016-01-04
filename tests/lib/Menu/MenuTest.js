@@ -96,6 +96,9 @@ describe('Menu', () => {
         it('should set link according to entity', () => {
             assert.equal('/comments/list', new Menu().populateFromEntity(new Entity('comments')).link());
         });
+        it('should set link to edit for singleton entity', () => {
+            assert.equal('/settings/edit', new Menu().populateFromEntity(new Entity('settings').singleton()).link());
+        });
         it('should set active function to entity', () => {
             let menu = new Menu().populateFromEntity(new Entity('comments'));
             assert.isTrue(menu.isActive('/comments/list'));
