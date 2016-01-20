@@ -62,6 +62,42 @@ describe('Entity', function() {
             assert.equal(false, entity.deletionView().enabled);
         });
     });
+
+    describe('singleton()', function () {
+        var entity;
+
+        beforeEach(function() {
+            entity = new Entity('post');
+        });
+
+        it('should not be single by default', function() {
+            assert.equal(false, entity.isSingleton);
+        });
+
+        it('should set singleton attribute', function() {
+            entity.singleton();
+            assert.equal(true, entity.isSingleton);
+        });
+
+        it('should disable create, delete and list views', function() {
+            entity.singleton();
+            entity.views.DashboardView.enable();
+            entity.views.MenuView.enable();
+            entity.views.EditView.enable();
+            entity.views.ShowView.enable();
+            entity.views.ExportView.enable();
+
+            assert.equal(true, entity.menuView().enabled);
+            assert.equal(true, entity.dashboardView().enabled);
+            assert.equal(true, entity.editionView().enabled);
+            assert.equal(true, entity.showView().enabled);
+            assert.equal(true, entity.exportView().enabled);
+            assert.equal(false, entity.listView().enabled);
+            assert.equal(false, entity.creationView().enabled);
+            assert.equal(false, entity.deletionView().enabled);
+            assert.equal(false, entity.batchDeleteView().enabled);
+        });
+    });
     
     describe('createMethod', function() {
         it('should return given createMethod if already set', function() {
