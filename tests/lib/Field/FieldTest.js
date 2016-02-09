@@ -90,6 +90,17 @@ describe('Field', function() {
 
     });
 
+    describe('condition()', function() {
+        it('should have sensible defaults', function() {
+            assert.deepEqual(new Field().condition(), {property: null, value: null});
+        });
+
+        it('should allow to change condition settings', function() {
+            var field = new Field().condition("foo", "bar");
+            assert.deepEqual(field.condition(), {property: "foo", value: "bar"});
+        });
+    });
+
     describe('validation()', function() {
         it('should have sensible defaults', function() {
             assert.deepEqual(new Field().validation(), {required: false, minlength : 0, maxlength : 99999});
