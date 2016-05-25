@@ -18,9 +18,9 @@ describe('WriteQueries', () => {
     beforeEach(() => {
         application = {
             getRouteFor: (entity, generatedUrl, viewType, id) => {
-                let url = 'http://localhost/' + entity.name();
+                let url = 'http://localhost/' + encodeURIComponent(entity.name());
                 if (id) {
-                    url += '/' + id;
+                    url += '/' + encodeURIComponent(id);
                 }
 
                 return url;

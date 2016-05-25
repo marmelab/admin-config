@@ -88,7 +88,7 @@ describe('Application', function() {
             var application = new Application();
             var entity = new Entity('posts');
             entity.url(function(entityName, viewType, identifierValue) {
-                return '/bar/baz' + (identifierValue ? ('/' + identifierValue * 2) : '');
+                return '/bar/baz' + (identifierValue ? ('/' + encodeURIComponent(identifierValue * 2)) : '');
             });
             application.addEntity(entity);
             var view = entity.listView();
@@ -101,7 +101,7 @@ describe('Application', function() {
             application.baseApiUrl('/foo/');
             var entity = new Entity('posts');
             entity.url(function(entityName, viewType, identifierValue) {
-                return 'bar/baz' + (identifierValue ? ('/' + identifierValue) : '');
+                return 'bar/baz' + (identifierValue ? ('/' + encodeURIComponent(identifierValue)) : '');
             });
             application.addEntity(entity);
             var view = entity.listView();
@@ -114,7 +114,7 @@ describe('Application', function() {
             application.baseApiUrl('/foo/');
             var entity = new Entity('posts');
             entity.url(function(entityName, viewType, identifierValue) {
-                return 'http://bar/baz' + (identifierValue ? ('/' + identifierValue) : '');
+                return 'http://bar/baz' + (identifierValue ? ('/' + encodeURIComponent(identifierValue)) : '');
             });
             application.addEntity(entity);
             var view = entity.listView();
@@ -186,7 +186,7 @@ describe('Application', function() {
             app.baseApiUrl('http://api.local');
 
             view.url(function (entityId) {
-                return '/post/:' + entityId;
+                return '/post/:' + encodeURIComponent(entityId);
             });
 
             assert.equal(app.getRouteFor(entity1, view.getUrl(1), view.type, 1, view.identifier()), 'http://api.local/post/:1');
@@ -200,7 +200,8 @@ describe('Application', function() {
             app.baseApiUrl('http://api.local');
 
             entity1.url(function (entityName, viewType, identifierValue) {
-                return '/' + entityName + '_' + viewType + '/:' + identifierValue;
+                var e = encodeURIComponent;
+                return '/' + e(entityName) + '_' + e(viewType) + '/:' + e(identifierValue);
             });
 
             assert.equal(app.getRouteFor(entity1, view.getUrl(1), view.type, 1, view.identifier()), 'http://api.local/comments_EditView/:1');
@@ -216,6 +217,16 @@ describe('Application', function() {
             entity1.url('http://mock.local/entity');
 
             assert.equal(app.getRouteFor(entity1, view.getUrl(1), view.type, 1, view.identifier()), 'http://mock.local/entity');
+        });
+
+        it('should escape the entity id or name if necessary', function() {
+            var application = new Application();
+            var entity = new Entity('my things');
+            application.addEntity(entity);
+            var view = entity.listView();
+            assert.equal('my%20things', application.getRouteFor(entity, view.getUrl(), view.type));
+            var id = "thing/12";
+            assert.equal('my%20things/thing%2F12', application.getRouteFor(entity, view.getUrl(id), view.type, id, view.identifier()));
         });
     });
 
