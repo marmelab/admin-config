@@ -18,7 +18,7 @@ class Field {
         this._detailLinkRoute = 'edit';
         this._pinned = false;
         this._flattenable = true;
-        this._description = null;
+        this._helpText = null;
         this.dashboard = true;
         this.list = true;
         this._template = () => '';
@@ -217,13 +217,13 @@ class Field {
         return this._flattenable;
     }
 
-    description() {
+    helpText() {
         if (arguments.length) {
-            this._description = arguments[0];
+            this._helpText = arguments[0];
             return this;
         }
 
-        return this._description;
+        return this._helpText;
     }
 
     getTemplateValue(data) {
