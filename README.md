@@ -32,6 +32,20 @@ module.exports = {
 };
 ```
 
+## Transpiling
+
+In order to increase this library compatibility and to not force other users of this
+library to use Babel, you need to transpile your ES6 code from `src/` to good old ES5
+code (in `lib/`).
+
+Just run:
+
+``` sh
+make transpile
+```
+
+And you are done!
+
 ## Running Tests
 
 ```sh
