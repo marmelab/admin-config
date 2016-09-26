@@ -1,10 +1,13 @@
+import ReferencedListField from '../Field/ReferencedListField';
+import ReferenceField from '../Field/ReferenceField';
+
 export default {
 
     getReferencedLists(fields) {
-        return this.indexByName(fields.filter(f => f.type() === 'referenced_list'));
+        return this.indexByName(fields.filter(f => f instanceof ReferencedListField));
     },
     getReferences(fields, withRemoteComplete, optimized = null) {
-        let references = fields.filter(f => f.type() === 'reference' || f.type() === 'reference_many');
+        let references = fields.filter( f => (f instanceof ReferenceField) && !(f instanceof ReferencedListField));
         if (withRemoteComplete === true) {
             references = references.filter(r => r.remoteComplete());
         } else if (withRemoteComplete === false) {
