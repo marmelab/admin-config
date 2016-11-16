@@ -8,7 +8,7 @@ export default {
             fields
                 .filter(f => f.type() === 'embedded_list')
                 .map(f => f.targetFields())
-                .reduce((a, b) => a.concat(b))
+                .reduce((a, b) => a.concat(b), [])
         ).filter(f => f.type() === 'reference' || f.type() === 'reference_many');
 
         if (withRemoteComplete === true) {
