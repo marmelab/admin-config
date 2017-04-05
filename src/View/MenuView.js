@@ -8,7 +8,7 @@ class MenuView extends View {
     }
 
     get enabled() {
-        return this._enabled || this.entity.views['ListView'].enabled;
+        return this._enabled === null ? this.entity._views['ListView'].enabled : this._enabled;
     }
 
     icon() {

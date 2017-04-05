@@ -9,6 +9,12 @@ import View from "../../../lib/View/View";
 import ListView from "../../../lib/View/ListView";
 
 describe('View', function() {
+
+    it('should be disabled by default', () => {
+        const view = new ListView().setEntity(new Entity('foobar'));
+        assert.isFalse(view.enabled);
+    });
+
     describe('name()', function() {
         it('should return a default name based on the entity name and view type', function() {
             var view = new ListView().setEntity(new Entity('foobar'));
@@ -186,6 +192,36 @@ describe('View', function() {
                 .fields(field2);
 
             assert.deepEqual(view.fields(), [field1, field2]);
+        });
+
+        it('should enable the view when setting fields', () => {
+            var view = new View();
+
+            assert.isFalse(view.enabled);
+
+            view.fields([new Field('test')]);
+            assert.isTrue(view.enabled);
+        });
+    });
+
+    describe('disable()', () => {
+        it('should disable the view', () => {
+            const view = new View();
+            view.enable();
+            assert.isTrue(view.enabled);
+            view.disable();
+            assert.isFalse(view.enabled);
+        });
+
+        it('should disable the view even if the fields have been set', () => {
+            const view = new View();
+
+            assert.isFalse(view.enabled);
+            view.fields([new Field('test')]);
+            assert.isTrue(view.enabled);
+
+            view.disable();
+            assert.isFalse(view.enabled);
         });
     });
 
