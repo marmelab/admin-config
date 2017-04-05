@@ -10,7 +10,7 @@ class View {
         this._description = '';
         this._template = null;
 
-        this._enabled = false;
+        this._enabled = null;
         this._fields = [];
         this._type = null;
         this._name = name;
@@ -21,7 +21,7 @@ class View {
     }
 
     get enabled() {
-        return this._enabled || !!this._fields.length;
+        return this._enabled === null ? !!this._fields.length : this._enabled;
     }
 
     title(title) {
