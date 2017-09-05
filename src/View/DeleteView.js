@@ -42,7 +42,7 @@ class DeleteView extends View {
      *         // stop the progress bar
      *         progression.done();
      *         // add a notification
-     *         notification.log(`Element #${entry._identifierValue} successfully edited.`, { addnCls: 'humane-flatty-success' });
+     *         notification.log(`Element #${entry._identifierValue} successfully deleted.`, { addnCls: 'humane-flatty-success' });
      *         // redirect to the list view
      *         $state.go($state.get('list'), { entity: entity.name() });
      *         // cancel the default action (redirect to the edition view)
@@ -88,7 +88,7 @@ class DeleteView extends View {
      *         // stop the progress bar
      *         progression.done();
      *         // add a notification
-     *         notification.log(`Some values are invalid, see details in the form`, { addnCls: 'humane-flatty-error' });
+     *         notification.log(`Failed to delete element.`, { addnCls: 'humane-flatty-error' });
      *         // cancel the default action (default error messages)
      *         return false;
      *     }]);
