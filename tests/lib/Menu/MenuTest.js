@@ -1,6 +1,7 @@
 var assert = require('chai').assert;
 
 import Menu from "../../../lib/Menu/Menu";
+import ChoicesField from "../../../lib/Field/ChoicesField";
 import Entity from "../../../lib/Entity/Entity";
 
 describe('Menu', () => {
@@ -106,6 +107,26 @@ describe('Menu', () => {
             let entity = new Entity('comments');
             entity.menuView().icon('<foo>');
             assert.equal('<foo>', new Menu().populateFromEntity(entity).icon());
+        });
+
+        it('should include pinned filters with default value inside link', () => {
+            let entity = new Entity('comments');
+
+            const statusFilter = new ChoicesField('status');
+            statusFilter.choices([
+                { label: 'rejected', value: 'rejected' },
+                { label: 'approved', value: 'approved' },
+                { label: 'pending', value: 'pending' },
+            ]);
+            statusFilter.pinned(true);
+            statusFilter.defaultValue(['rejected', 'approved'])
+
+            entity.listView().filters([statusFilter]);
+
+            assert.equal(
+                new Menu().populateFromEntity(entity).link(),
+                '/comments/list?search=%7B%22status%22%3A%5B%22rejected%22%2C%22approved%22%5D%7D'
+            );
         });
     });
 

@@ -112,7 +112,24 @@ class Menu {
         }
         this.title(entity.label());
         this.active(path => path.indexOf(`/${entity.name()}/`) === 0 );
-        this.link(`/${entity.name()}/list`);
+
+        let search = "";
+        const defaultFilters = entity.listView().filters()
+            .filter(filter => filter.pinned() && filter.defaultValue())
+            .reduce((filters, currentFilter) => Object.assign(
+                {},
+                filters,
+                {
+                    [currentFilter.name()] : currentFilter.getTransformedValue(currentFilter.defaultValue())
+                }
+            ), {});
+
+        if(Object.keys(defaultFilters).length){
+            const encodedDefaultFilters = encodeURIComponent(JSON.stringify(defaultFilters));
+            search = `?search=${encodedDefaultFilters}`
+        }
+
+        this.link(`/${entity.name()}/list${search}`);
         // deprecated
         this.icon(entity.menuView().icon());
         return this;
