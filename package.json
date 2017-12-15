@@ -1,10 +1,10 @@
 {
   "name": "admin-config",
-  "version": "0.12.2",
+  "version": "0.12.3",
   "private": false,
   "files": [
-      "*.md",
-      "lib"
+    "*.md",
+    "lib"
   ],
   "repository": {
     "type": "git",
@@ -20,7 +20,7 @@
     "sinon": "^1.14.1"
   },
   "scripts": {
-      "prepublish": "make transpile",
-      "test": "make test"
+    "prepublish": "make transpile",
+    "test": "make test"
   }
 }
