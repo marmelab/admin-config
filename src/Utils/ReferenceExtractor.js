@@ -4,7 +4,13 @@ export default {
         return this.indexByName(fields.filter(f => f.type() === 'referenced_list'));
     },
     getReferences(fields, withRemoteComplete, optimized = null) {
-        let references = fields.filter(f => f.type() === 'reference' || f.type() === 'reference_many');
+        let references = fields.concat(
+            fields
+                .filter(f => f.type() === 'embedded_list')
+                .map(f => f.targetFields())
+                .reduce((a, b) => a.concat(b), [])
+        ).filter(f => f.type() === 'reference' || f.type() === 'reference_many');
+
         if (withRemoteComplete === true) {
             references = references.filter(r => r.remoteComplete());
         } else if (withRemoteComplete === false) {

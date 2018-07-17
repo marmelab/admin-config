@@ -32,6 +32,22 @@ describe('ReferenceExtractor', () => {
                 bar: fields[1]
             }, ReferenceExtractor.getReferences(fields));
         })
+
+        it('should index reference fields in embedded_list', () => {
+            const embedded_fields = [
+                { type() { return 'reference' }, name() { return 'foo1' } },
+                { type() { return 'reference_many' }, name() { return 'foo2' } },
+                { type() { return 'referenced_list' }, name() { return 'foo3' } },
+            ]
+            const fields = [
+                { type() { return 'embedded_list' }, name() { return 'foo' }, targetFields() { return embedded_fields } },
+                { type() { return 'string' }, name() { return 'bar' } },
+            ];
+            assert.deepEqual({
+                foo1: embedded_fields[0],
+                foo2: embedded_fields[1],
+            }, ReferenceExtractor.getReferences(fields));
+        })
     })
 
     describe('getReferencedLists', () => {
